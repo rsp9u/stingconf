@@ -9,7 +9,7 @@ configuration file and default value.
 ## Installation
 
 ```
-pip install git+https://github.com/rsp9u/stingconf.git
+pip install stingconf
 ```
 
 ## Examples
