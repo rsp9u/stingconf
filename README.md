@@ -46,7 +46,7 @@ conf_c: file-conf-c
 
 * run example
 
-```
+```bash
 $ export SC_CONF_A=300
 $ python example.py --conf-a 200 -b 20.0
 CONF_A: 300
@@ -60,7 +60,6 @@ CONF_D: conf-d
 * example.py
 
 ```python
-import yaml
 import stingconf
 
 definitions = {
@@ -89,6 +88,55 @@ definitions = {
         },
     },
 }
+parser = stingconf.Parser('Example module', definitions)
+parser.parse()
+```
+
+### define args with file
+
+* definitions.yml
+
+```yaml
+env_prefix: SC
+conf_file: config.yml
+order:
+  - env
+  - arg
+  - file
+  - default
+items:
+  user:
+    help: 'login user'
+    arg:
+      short: u
+  password:
+    help: 'login passowrd'
+    arg:
+      short: p
+  enable:
+    type: bool
+    default: false
+    help: 'enable something'
+    arg:
+      long_prefix: '-'
+  http-proxy:
+    env:
+      no_prefix: true
+      ignorecase: true
+  https-proxy:
+    env:
+      no_prefix: true
+      ignorecase: true
+```
+
+* example.py
+
+```python
+import yaml
+import stingconf
+
+with open('definitions.yml') as f:
+	definitions = yaml.safe_load(f)
 parser = stingconf.Parser('Example module', definitions)
 parser.parse()
 ```
