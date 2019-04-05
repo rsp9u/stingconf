@@ -34,6 +34,7 @@ class Parser():
             'default': default,
             'no_prefix': no_prefix,
         }
+        item.update(kwargs)
         self._items.append(item)
 
         arg_names = []
@@ -76,7 +77,9 @@ class Parser():
             env_name = '{0}_{1}'.format(self._env_prefix, env_name)
         if item.get('env', {}).get('ignorecase'):
             for n in (env_name.upper(), env_name.lower()):
-                return os.environ.get(n)
+                if n in os.environ:
+                    return os.environ[n]
+            return None
         else:
             return os.environ.get(env_name)
 
