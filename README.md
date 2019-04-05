@@ -1,5 +1,8 @@
 # StingConf
 
+[![Build Status](https://travis-ci.org/rsp9u/stingconf.svg?branch=master)](https://travis-ci.org/rsp9u/stingconf)
+[![codecov](https://codecov.io/gh/rsp9u/stingconf/branch/master/graph/badge.svg)](https://codecov.io/gh/rsp9u/stingconf)
+
 This is a configuration library through envrionment variables, command line arguments,
 configuration file and default value.
 
