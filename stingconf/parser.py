@@ -1,5 +1,4 @@
 import os
-import sys
 import argparse
 import json
 import yaml
@@ -26,7 +25,8 @@ class Parser():
                 value.update(value.get('arg', {}))
                 self.add(name, **value)
 
-    def add(self, name, short=None, type=str, default=None, no_prefix=False, long_prefix='--', short_prefix='-', help=None, **kwargs):
+    def add(self, name, short=None, type=str, default=None,
+            no_prefix=False, long_prefix='--', short_prefix='-', help=None, **kwargs):
         item = {
             'name': name,
             'short': short,
