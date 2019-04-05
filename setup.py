@@ -8,7 +8,7 @@ setup(
     author_email='',
     maintainer='rsp9u',
     maintainer_email='gctwt852@yahoo.co.jp',
-    license='',
+    license='MIT',
     url='',
     description='Layered configuration library',
     packages=['stingconf'],
