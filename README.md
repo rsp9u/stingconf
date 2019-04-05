@@ -9,14 +9,16 @@ configuration file and default value.
 pip install git+https://github.com/rsp9u/stingconf.git
 ```
 
-## Getting started
+## Examples
+
+### define args with functions
 
 * example.py
 
 ```python
 import stingconf
 
-parser = stingconf.Parser()
+parser = stingconf.Parser('Example module')
 parser.env_prefix('SC')
 parser.conf_file('config.yml')
 parser.add('conf-a', short='a', type=int, default=0)
@@ -50,6 +52,44 @@ CONF_C: file-conf-c
 CONF_D: conf-d
 ```
 
+### define args with object
+
+* example.py
+
+```python
+import yaml
+import stingconf
+
+definitions = {
+    'env_prefix': 'SC',
+    'conf_file': 'config.yml',
+    'items': {
+        'conf-a': {
+            'arg': {'short': 'a'},
+            'type': 'int',
+            'default': 0,
+        },
+        'conf-b': {
+            'arg': {'short': 'b'},
+            'type': 'float',
+            'default': 0.0,
+        },
+        'conf-c': {
+            'arg': {'short': 'c'},
+            'type': 'str',
+            'default': 'conf-c',
+        },
+        'conf-d': {
+            'arg': {'short': 'd'},
+            'default': 'conf-d',
+            'help': '4th config',
+        },
+    },
+}
+parser = stingconf.Parser('Example module', definitions)
+parser.parse()
+```
+
 ## Naming convention
 
 ### Environment
@@ -68,5 +108,5 @@ If desired, you can use short version argument by passing `short` to `Parser.add
 
 Variables' name in the configuration file should be set `like_this`
 
-Currently, the supported formats are json and yaml, and the file contains content
-must be non-nested dictionary.
+Currently, the supported formats are json and yaml, and the content must be
+non-nested dictionary.
