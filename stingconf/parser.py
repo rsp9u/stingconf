@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import json
 import yaml
@@ -62,7 +63,7 @@ class Parser():
             self._order.insert(0, o)
 
     def parse(self):
-        self._args = self._argparser.parse_args()
+        self._args = self._argparser.parse_args(sys.argv[1:])
         for item in self._items:
             for o in self._order:
                 f = getattr(self, '_get_from_' + o)
