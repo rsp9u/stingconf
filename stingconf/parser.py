@@ -63,10 +63,14 @@ class Parser():
             self._order.remove(o)
             self._order.insert(0, o)
 
-    def parse(self):
+    def parse(self, argv=None):
         config = Config()
 
-        self._args = self._argparser.parse_args(sys.argv[1:])
+        if argv is None:
+            self._args = self._argparser.parse_args(sys.argv[1:])
+        else:
+            self._args = self._argparser.parse_args(argv)
+
         for item in self._items:
             for o in self._order:
                 f = getattr(self, '_get_from_' + o)
