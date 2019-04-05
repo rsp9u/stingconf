@@ -4,6 +4,7 @@ import argparse
 import json
 import yaml
 from .utils import str_to_type, to_upper_snake
+from .config import Config
 
 
 class Parser():
@@ -63,6 +64,8 @@ class Parser():
             self._order.insert(0, o)
 
     def parse(self):
+        config = Config()
+
         self._args = self._argparser.parse_args(sys.argv[1:])
         for item in self._items:
             for o in self._order:
@@ -75,8 +78,10 @@ class Parser():
                 except ValueError:
                     # TODO: Add warning log
                     continue
-                setattr(self, to_upper_snake(item['name']), value)
+                config.add(to_upper_snake(item['name']), value, item)
                 break
+
+        return config
 
     def _get_from_env(self, item):
         env_name = to_upper_snake(item['name'])

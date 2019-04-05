@@ -18,8 +18,8 @@ def test_default(type_func, default):
     parser = stingconf.Parser()
     parser.add('foo-config', type=type_func, default=default)
 
-    parser.parse()
-    assert parser.FOO_CONFIG == default
+    config = parser.parse()
+    assert config.FOO_CONFIG == default
 
 
 @pytest.mark.parametrize('type_func,env_value', [
@@ -33,9 +33,9 @@ def test_env(type_func, env_value):
     parser.add('foo-config', type=type_func)
 
     os.environ['FOO_CONFIG'] = str(env_value)
-    parser.parse()
+    config = parser.parse()
     os.environ.pop('FOO_CONFIG')
-    assert parser.FOO_CONFIG == env_value
+    assert config.FOO_CONFIG == env_value
 
 
 @pytest.mark.parametrize('type_func,arg_value', [
@@ -49,8 +49,8 @@ def test_arg(type_func, arg_value):
     parser.add('foo-config', type=type_func)
 
     with mock.patch.object(stingconf.parser.sys, 'argv', ['prog_name', '--foo-config=' + str(arg_value)]):
-        parser.parse()
-        assert parser.FOO_CONFIG == arg_value
+        config = parser.parse()
+        assert config.FOO_CONFIG == arg_value
 
 
 @pytest.mark.parametrize('type_func,file_value', [
@@ -66,8 +66,8 @@ def test_file(tmpdir, type_func, file_value):
     p = tmpdir.join('config.yml')
     p.write('foo_config: ' + str(file_value))
     parser.conf_file(p.strpath)
-    parser.parse()
-    assert parser.FOO_CONFIG == file_value
+    config = parser.parse()
+    assert config.FOO_CONFIG == file_value
 
 
 def _config_generator(tmpdir, parser=None):
@@ -75,23 +75,23 @@ def _config_generator(tmpdir, parser=None):
         parser = stingconf.Parser()
     parser.add('foo-config', default='foo')
 
-    parser.parse()
-    yield parser.FOO_CONFIG
+    config = parser.parse()
+    yield config.FOO_CONFIG
 
     p = tmpdir.join('config.yml')
     p.write('foo_config: file-foo')
     parser.conf_file(p.strpath)
-    parser.parse()
-    yield parser.FOO_CONFIG
+    config = parser.parse()
+    yield config.FOO_CONFIG
 
     with mock.patch.object(stingconf.parser.sys, 'argv', ['prog_name', '--foo-config=arg-foo']):
-        parser.parse()
-        yield parser.FOO_CONFIG
+        config = parser.parse()
+        yield config.FOO_CONFIG
 
         os.environ['FOO_CONFIG'] = 'env-foo'
-        parser.parse()
+        config = parser.parse()
         os.environ.pop('FOO_CONFIG')
-        yield parser.FOO_CONFIG
+        yield config.FOO_CONFIG
 
 
 def test_default_order_to_default(tmpdir):
@@ -157,10 +157,10 @@ def test_env_prefix():
 
     os.environ['FOO_CONFIG'] = 'foo'
     os.environ['TEST_FOO_CONFIG'] = 'test-foo'
-    parser.parse()
+    config = parser.parse()
     os.environ.pop('FOO_CONFIG')
     os.environ.pop('TEST_FOO_CONFIG')
-    assert parser.FOO_CONFIG == 'test-foo'
+    assert config.FOO_CONFIG == 'test-foo'
 
 
 def test_env_no_prefix():
@@ -170,10 +170,10 @@ def test_env_no_prefix():
 
     os.environ['FOO_CONFIG'] = 'foo'
     os.environ['TEST_FOO_CONFIG'] = 'test-foo'
-    parser.parse()
+    config = parser.parse()
     os.environ.pop('FOO_CONFIG')
     os.environ.pop('TEST_FOO_CONFIG')
-    assert parser.FOO_CONFIG == 'foo'
+    assert config.FOO_CONFIG == 'foo'
 
 
 def test_env_ignorecase():
@@ -182,9 +182,9 @@ def test_env_ignorecase():
     parser.add('foo-config', env={'ignorecase': True})
 
     os.environ['test_foo_config'] = 'foo'
-    parser.parse()
+    config = parser.parse()
     os.environ.pop('test_foo_config')
-    assert parser.FOO_CONFIG == 'foo'
+    assert config.FOO_CONFIG == 'foo'
 
 
 def test_arg_short():
@@ -192,8 +192,8 @@ def test_arg_short():
     parser.add('foo-config', short='f')
 
     with mock.patch.object(stingconf.parser.sys, 'argv', ['prog_name', '-f', 'foo']):
-        parser.parse()
-        assert parser.FOO_CONFIG == 'foo'
+        config = parser.parse()
+        assert config.FOO_CONFIG == 'foo'
 
 
 def test_file_json(tmpdir):
@@ -203,5 +203,5 @@ def test_file_json(tmpdir):
     p = tmpdir.join('config.json')
     p.write('{"foo_config": "foo"}')
     parser.conf_file(p.strpath, type='json')
-    parser.parse()
-    assert parser.FOO_CONFIG == 'foo'
+    config = parser.parse()
+    assert config.FOO_CONFIG == 'foo'

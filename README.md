@@ -28,12 +28,12 @@ parser.add('conf-a', short='a', type=int, default=0)
 parser.add('conf-b', short='b', type=float, default=0.0)
 parser.add('conf-c', short='c', type=str, default='conf-c')
 parser.add('conf-d', short='d', default='conf-d', help='4th config')
-parser.parse()
+config = parser.parse()
 
-print('CONF_A:', parser.CONF_A)
-print('CONF_B:', parser.CONF_B)
-print('CONF_C:', parser.CONF_C)
-print('CONF_D:', parser.CONF_D)
+print('CONF_A:', config.CONF_A)
+print('CONF_B:', config.CONF_B)
+print('CONF_C:', config.CONF_C)
+print('CONF_D:', config.CONF_D)
 ```
 
 * config.yml
@@ -89,7 +89,7 @@ definitions = {
     },
 }
 parser = stingconf.Parser('Example module', definitions)
-parser.parse()
+config = parser.parse()
 ```
 
 ### define args with file
@@ -138,7 +138,7 @@ import stingconf
 with open('definitions.yml') as f:
 	definitions = yaml.safe_load(f)
 parser = stingconf.Parser('Example module', definitions)
-parser.parse()
+config = parser.parse()
 ```
 
 ## Naming convention
