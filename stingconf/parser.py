@@ -3,6 +3,7 @@ import sys
 import argparse
 import json
 import yaml
+from copy import deepcopy
 from .utils import str_to_type, to_upper_snake
 from .config import Config
 
@@ -22,10 +23,11 @@ class Parser():
             self.order(*definitions.get('order', ['env', 'arg', 'file', 'default']))
             self._items = []
             for name, value in definitions.get('items', {}).items():
-                if 'type' in value:
-                    value['type'] = str_to_type(value['type'])
-                value.update(value.get('arg', {}))
-                self.add(name, **value)
+                v = deepcopy(value)
+                v['type'] = str_to_type(v.get('type', 'str'))
+                v.update(value.get('arg', {}))
+                v.update(value.get('env', {}))
+                self.add(name, **v)
 
     def add(self, name, short=None, type=str, default=None,
             no_prefix=False, long_prefix='--', short_prefix='-', help=None, **kwargs):
