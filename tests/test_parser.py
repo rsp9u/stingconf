@@ -196,6 +196,24 @@ def test_arg_short():
         assert config.FOO_CONFIG == 'foo'
 
 
+def test_arg_long_prefix():
+    parser = stingconf.Parser()
+    parser.add('foo-config', arg={'long_prefix': '-'})
+
+    with mock.patch.object(stingconf.parser.sys, 'argv', ['prog_name', '-foo-config', 'foo']):
+        config = parser.parse()
+        assert config.FOO_CONFIG == 'foo'
+
+
+def test_arg_short_prefix():
+    parser = stingconf.Parser()
+    parser.add('foo-config', short='f', arg={'short_prefix': '--'})
+
+    with mock.patch.object(stingconf.parser.sys, 'argv', ['prog_name', '--f', 'foo']):
+        config = parser.parse()
+        assert config.FOO_CONFIG == 'foo'
+
+
 def test_file_json(tmpdir):
     parser = stingconf.Parser()
     parser.add('foo-config')
