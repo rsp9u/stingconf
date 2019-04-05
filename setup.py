@@ -20,7 +20,7 @@ def read(fname):
 
 setup(
     name='stingconf',
-    version='0.0.1',
+    version='0.0.2',
     author='',
     author_email='',
     maintainer='rsp9u',
