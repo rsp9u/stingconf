@@ -198,7 +198,7 @@ def test_arg_short():
 
 def test_arg_long_prefix():
     parser = stingconf.Parser()
-    parser.add('foo-config', arg={'long_prefix': '-'})
+    parser.add('foo-config', long_prefix='-')
 
     with mock.patch.object(stingconf.parser.sys, 'argv', ['prog_name', '-foo-config', 'foo']):
         config = parser.parse()
@@ -207,7 +207,7 @@ def test_arg_long_prefix():
 
 def test_arg_short_prefix():
     parser = stingconf.Parser()
-    parser.add('foo-config', short='f', arg={'short_prefix': '--'})
+    parser.add('foo-config', short='f', short_prefix='--')
 
     with mock.patch.object(stingconf.parser.sys, 'argv', ['prog_name', '--f', 'foo']):
         config = parser.parse()
