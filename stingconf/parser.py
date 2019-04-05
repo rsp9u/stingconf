@@ -3,32 +3,52 @@ import sys
 import argparse
 import json
 import yaml
+from .utils import str_to_type, to_upper_snake
 
 
 class Parser():
-    def __init__(self, description=''):
+    def __init__(self, description='', definitions=None):
         self._argparser = argparse.ArgumentParser(description=description)
         self._args = None
         self._conf_file = None
-        self._items = []
         self._env_prefix = None
         self._order = ['env', 'arg', 'file', 'default']
+        self._items = []
 
-    def add(self, name, short=None, type=str, default=None):
+        if definitions is not None:
+            self.conf_file(definitions.get('conf_file', None))
+            self.env_prefix(definitions.get('env_prefix', None))
+            self.order(*definitions.get('order', ['env', 'arg', 'file', 'default']))
+            self._items = []
+            for name, value in definitions.get('items', {}).items():
+                if 'type' in value:
+                    value['type'] = str_to_type(value['type'])
+                value.update(value.get('arg', {}))
+                self.add(name, **value)
+
+    def add(self, name, short=None, type=str, default=None, no_prefix=False, long_prefix='--', short_prefix='-', help=None, **kwargs):
         item = {
             'name': name,
-            'uname': name.upper().replace('-', '_'),
             'short': short,
             'type': type,
             'default': default,
+            'no_prefix': no_prefix,
         }
         self._items.append(item)
-        self._argparser.add_argument('--' + name, dest=item['uname'], metavar=short, type=type)
+
+        arg_names = []
+        arg_names.append(long_prefix + name)
+        if short is not None:
+            arg_names.append(short_prefix + short)
+        self._argparser.add_argument(*arg_names, dest=to_upper_snake(name), type=type, help=help)
 
     def env_prefix(self, prefix):
         self._env_prefix = prefix
 
     def conf_file(self, path, type='yaml'):
+        if path is None:
+            return
+
         with open(path) as f:
             if type == 'yaml':
                 self._conf_file = yaml.load(f)
@@ -44,22 +64,24 @@ class Parser():
         self._args = self._argparser.parse_args()
         for item in self._items:
             for o in self._order:
-                print('part', o)
                 f = getattr(self, '_get_from_' + o)
                 value = f(item)
-                print('ret: ', value)
                 if value is not None:
-                    setattr(self, item['uname'], value)
+                    setattr(self, to_upper_snake(item['name']), value)
                     break
 
     def _get_from_env(self, item):
-        env_name = item['uname']
-        if self._env_prefix is not None:
+        env_name = to_upper_snake(item['name'])
+        if self._env_prefix is not None and not item.get('env', {}).get('no_prefix'):
             env_name = '{0}_{1}'.format(self._env_prefix, env_name)
-        return os.environ.get(env_name)
+        if item.get('env', {}).get('ignorecase'):
+            for n in (env_name.upper(), env_name.lower()):
+                return os.environ.get(n)
+        else:
+            return os.environ.get(env_name)
 
     def _get_from_arg(self, item):
-        return getattr(self._args, item['uname'])
+        return getattr(self._args, to_upper_snake(item['name']))
 
     def _get_from_file(self, item):
         if self._conf_file is None:

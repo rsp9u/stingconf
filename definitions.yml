@@ -1,0 +1,35 @@
+env_prefix: TEST
+conf_file: config.yml
+order:
+  - file
+  - env
+  - arg
+  - default
+items:
+  time-wait:
+    type: int
+    default: 10
+    arg:
+      short: t
+  user:
+    help: 'login user name'
+    arg:
+      short: u
+  password:
+    help: 'login passowrd'
+    arg:
+      short: p
+  enable:
+    type: bool
+    default: false
+    help: 'enable something'
+    arg:
+      long_prefix: '-'
+  http-proxy:
+    env:
+      no_prefix: true
+      ignorecase: true
+  https-proxy:
+    env:
+      no_prefix: true
+      ignorecase: true

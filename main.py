@@ -1,15 +1,14 @@
 import stingconf
+import yaml
 
 
-parser = stingconf.Parser(description='This is test module.')
-print(parser)
-print(type(parser))
-print(dir(parser))
-parser.env_prefix('TEST')
-parser.conf_file('config.yml')
-parser.add('time-wait', short='t', type=int, default=10)
-parser.order('env', 'arg', 'file', 'default')
-
+with open('definitions.yml') as f:
+    definitions = yaml.load(f)
+parser = stingconf.Parser('This is test module.', definitions)
 parser.parse()
+
 print(parser.TIME_WAIT)
-print(type(parser.TIME_WAIT))
+print(parser.USER)
+print(parser.PASSWORD)
+print(parser.HTTP_PROXY)
+print(parser.HTTPS_PROXY)
