@@ -67,14 +67,15 @@ class Parser():
             for o in self._order:
                 f = getattr(self, '_get_from_' + o)
                 value = f(item)
+                if value is None:
+                    continue
                 try:
                     value = item['type'](value)
                 except ValueError:
                     # TODO: Add warning log
                     continue
-                if value is not None:
-                    setattr(self, to_upper_snake(item['name']), value)
-                    break
+                setattr(self, to_upper_snake(item['name']), value)
+                break
 
     def _get_from_env(self, item):
         env_name = to_upper_snake(item['name'])
