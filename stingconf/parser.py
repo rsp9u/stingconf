@@ -51,7 +51,7 @@ class Parser():
 
         with open(path) as f:
             if type == 'yaml':
-                self._conf_file = yaml.load(f)
+                self._conf_file = yaml.safe_load(f)
             elif type == 'json':
                 self._conf_file = json.load(f)
 

@@ -3,7 +3,7 @@ import yaml
 
 
 with open('definitions.yml') as f:
-    definitions = yaml.load(f)
+    definitions = yaml.safe_load(f)
 parser = stingconf.Parser('This is test module.', definitions)
 parser.parse()
 
