@@ -1,5 +1,14 @@
+import sys
 from setuptools import setup
 
+
+tests_require = [
+    'pytest',
+    'pytest-mock',
+]
+
+if sys.version_info < (3, 0):
+    tests_require.append('mock')
 
 setup(
     name='stingconf',
@@ -18,12 +27,10 @@ setup(
     setup_requires=[
         'pytest-runner'
     ],
-    tests_require=[
-        'pytest',
-        'pytest-mock',
-    ],
+    tests_require=tests_require,
     classifiers=[
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.7',
         'Operating System :: OS Independent',
     ],
 )
