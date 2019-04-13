@@ -22,6 +22,14 @@ def test_default(type_func, default):
     assert config.FOO_CONFIG == default
 
 
+def test_without_default():
+    parser = stingconf.Parser()
+    parser.add('foo-config')
+
+    config = parser.parse()
+    assert hasattr(config, 'FOO_CONFIG') is False
+
+
 @pytest.mark.parametrize('type_func,env_value', [
     (str, 'foo'),
     (int, 100),
