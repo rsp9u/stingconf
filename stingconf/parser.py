@@ -116,20 +116,20 @@ class Parser():
             return type_func(value)
 
     def _get_from_env(self, item):
-        def _env_split(env, item):
-            if isinstance(env, str) and item['repeatable']:
-                return env.split(item['delimiter'])
-            else:
-                return env
-
-        env_name = to_upper_snake(item['name'])
-        if self._env_prefix is not None and not item.get('env', {}).get('no_prefix'):
-            env_name = '{0}_{1}'.format(self._env_prefix, env_name)
+        if self._env_prefix is None or item.get('env', {}).get('no_prefix'):
+            env_name = to_upper_snake(item['name'])
+        else:
+            env_name = to_upper_snake('{0}_{1}'.format(self._env_prefix, item['name']))
 
         if item.get('env', {}).get('ignorecase'):
-            return _env_split({k.upper(): v for k, v in os.environ.items()}.get(env_name.upper()), item)
+            env_value = {k.upper(): v for k, v in os.environ.items()}.get(env_name.upper())
         else:
-            return _env_split(os.environ.get(env_name), item)
+            env_value = os.environ.get(env_name)
+
+        if isinstance(env_value, str) and item['repeatable']:
+            return env_value.split(item['delimiter'])
+        else:
+            return env_value
 
     def _get_from_arg(self, item):
         return getattr(self._args, to_upper_snake(item['name']))
