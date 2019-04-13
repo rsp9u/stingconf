@@ -38,6 +38,23 @@ def test_env(type_func, env_value):
     assert config.FOO_CONFIG == env_value
 
 
+@pytest.mark.parametrize('type_func,env_values,delimiter', [
+    (str, ['foo', 'bar'], ','),
+    (str, ['foo', 'bar'], '|'),
+    (int, [100, 200], ':'),
+    (float, [10.0, 5.5], '&'),
+    (bool, [True, False], '::'),
+])
+def test_repeatable_env(type_func, env_values, delimiter):
+    parser = stingconf.Parser()
+    parser.add('foo-config', type=type_func, repeatable=True, delimiter=delimiter)
+
+    os.environ['FOO_CONFIG'] = delimiter.join([str(v) for v in env_values])
+    config = parser.parse()
+    os.environ.pop('FOO_CONFIG')
+    assert config.FOO_CONFIG == env_values
+
+
 @pytest.mark.parametrize('type_func,arg_value', [
     (str, 'foo'),
     (int, 100),
@@ -51,6 +68,21 @@ def test_arg(type_func, arg_value):
     with mock.patch.object(stingconf.parser.sys, 'argv', ['prog_name', '--foo-config=' + str(arg_value)]):
         config = parser.parse()
         assert config.FOO_CONFIG == arg_value
+
+
+@pytest.mark.parametrize('type_func,arg_values', [
+    (str, ['foo', 'bar']),
+    (int, [100, 200]),
+    (float, [10.0, 5.5]),
+    (bool, [True, False]),
+])
+def test_repeatable_arg(type_func, arg_values):
+    parser = stingconf.Parser()
+    parser.add('foo-config', type=type_func, repeatable=True)
+
+    with mock.patch.object(stingconf.parser.sys, 'argv', ['prog_name', '--foo-config'] + [str(v) for v in arg_values]):
+        config = parser.parse()
+        assert config.FOO_CONFIG == arg_values
 
 
 @pytest.mark.parametrize('type_func,file_value', [
@@ -68,6 +100,23 @@ def test_file(tmpdir, type_func, file_value):
     parser.conf_file(p.strpath)
     config = parser.parse()
     assert config.FOO_CONFIG == file_value
+
+
+@pytest.mark.parametrize('type_func,file_values', [
+    (str, ['foo', 'bar']),
+    (int, [100, 200]),
+    (float, [10.0, 5.5]),
+    (bool, [True, False]),
+])
+def test_repeatable_file(tmpdir, type_func, file_values):
+    parser = stingconf.Parser()
+    parser.add('foo-config', type=type_func, repeatable=True)
+
+    p = tmpdir.join('config.yml')
+    p.write('foo_config: [' + ','.join([str(v) for v in file_values]) + ']')
+    parser.conf_file(p.strpath)
+    config = parser.parse()
+    assert config.FOO_CONFIG == file_values
 
 
 def _config_generator(tmpdir, parser=None):
