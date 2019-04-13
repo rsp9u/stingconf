@@ -125,11 +125,9 @@ class Parser():
         env_name = to_upper_snake(item['name'])
         if self._env_prefix is not None and not item.get('env', {}).get('no_prefix'):
             env_name = '{0}_{1}'.format(self._env_prefix, env_name)
+
         if item.get('env', {}).get('ignorecase'):
-            for n in (env_name.upper(), env_name.lower()):
-                if n in os.environ:
-                    return _env_split(os.environ[n], item)
-            return None
+            return _env_split({k.upper(): v for k, v in os.environ.items()}.get(env_name.upper()), item)
         else:
             return _env_split(os.environ.get(env_name), item)
 
