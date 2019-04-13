@@ -30,13 +30,17 @@ class Parser():
                 self.add(name, **v)
 
     def add(self, name, short=None, type=str, default=None,
-            no_prefix=False, long_prefix='--', short_prefix='-', help=None, **kwargs):
+            no_prefix=False, long_prefix='--', short_prefix='-',
+            repeatable=False, delimiter=',',
+            help=None, **kwargs):
         item = {
             'name': name,
             'short': short,
-            'type': type,
+            'type': self._type_func(type),
             'default': default,
             'no_prefix': no_prefix,
+            'repeatable': repeatable,
+            'delimiter': delimiter,
         }
         item.update(kwargs)
         self._items.append(item)
@@ -45,7 +49,12 @@ class Parser():
         arg_names.append(long_prefix + name)
         if short is not None:
             arg_names.append(short_prefix + short)
-        self._argparser.add_argument(*arg_names, dest=to_upper_snake(name), type=type, help=help)
+        if repeatable:
+            nargs = '+'
+        else:
+            nargs = None
+        self._argparser.add_argument(*arg_names, dest=to_upper_snake(name),
+                                     type=self._type_func(type), nargs=nargs, help=help)
 
     def env_prefix(self, prefix):
         self._env_prefix = prefix
@@ -80,7 +89,7 @@ class Parser():
                 if value is None:
                     continue
                 try:
-                    value = item['type'](value)
+                    value = self._cast_value(value, item['type'])
                 except ValueError:
                     # TODO: Add warning log
                     continue
@@ -89,17 +98,40 @@ class Parser():
 
         return config
 
+    def _type_func(self, type_func):
+        def _to_bool(s):
+            if isinstance(s, str):
+                return s.lower() in ["true", "t", "yes", "1"]
+            else:
+                return bool(s)
+        if type_func.__name__ == 'bool':
+            return _to_bool
+        else:
+            return type_func
+
+    def _cast_value(self, value, type_func):
+        if isinstance(value, list):
+            return [type_func(elem) for elem in value]
+        else:
+            return type_func(value)
+
     def _get_from_env(self, item):
+        def _env_split(env, item):
+            if isinstance(env, str) and item['repeatable']:
+                return env.split(item['delimiter'])
+            else:
+                return env
+
         env_name = to_upper_snake(item['name'])
         if self._env_prefix is not None and not item.get('env', {}).get('no_prefix'):
             env_name = '{0}_{1}'.format(self._env_prefix, env_name)
         if item.get('env', {}).get('ignorecase'):
             for n in (env_name.upper(), env_name.lower()):
                 if n in os.environ:
-                    return os.environ[n]
+                    return _env_split(os.environ[n], item)
             return None
         else:
-            return os.environ.get(env_name)
+            return _env_split(os.environ.get(env_name), item)
 
     def _get_from_arg(self, item):
         return getattr(self._args, to_upper_snake(item['name']))
