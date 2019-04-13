@@ -13,6 +13,10 @@ def test_str_to_type(type_str, test_input, expected):
     assert expected == cast_func(test_input)
 
 
+def test_str_to_type_with_not_typefunc():
+    assert None is utils.str_to_type('nottypefunc')
+
+
 @pytest.mark.parametrize('test_input,expected', [
     ('spi-nal-case', 'SPI_NAL_CASE'),
     ('mixed-CASE', 'MIXED_CASE'),
