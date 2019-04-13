@@ -192,3 +192,11 @@ def test_file_json(tmpdir):
     parser.conf_file(p.strpath, type='json')
     config = parser.parse()
     assert config.FOO_CONFIG == 'foo'
+
+
+def test_pass_args():
+    parser = stingconf.Parser()
+    parser.add('foo-config')
+
+    config = parser.parse(['--foo-config', 'foo'])
+    assert config.FOO_CONFIG == 'foo'
