@@ -156,6 +156,17 @@ def test_env_ignorecase():
     assert config.FOO_CONFIG == 'foo'
 
 
+def test_env_ignorecase_mixed_case():
+    parser = stingconf.Parser()
+    parser.env_prefix('TEST')
+    parser.add('foo-config', env={'ignorecase': True})
+
+    os.environ['test_FOO_config'] = 'foo'
+    config = parser.parse()
+    os.environ.pop('test_FOO_config')
+    assert config.FOO_CONFIG == 'foo'
+
+
 def test_arg_short():
     parser = stingconf.Parser()
     parser.add('foo-config', short='f')
